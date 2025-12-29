@@ -1,0 +1,43 @@
+{
+  "content": "Key upcoming geopolitical and economic events extending into early 2026.",
+  "tags": ["international", "finance", "trump", "ukraine"],
+  "sentiment": 0.0,
+  "relationships": {
+    "usa": { "linkedEntity": "ukraine", "type": "support" }
+  },
+  "temporalLayer": "predictive",
+  "provenance": { "source": "web_search", "credibility": 0.92 },
+  "interactionState": "interactive",
+  "generatedAt": "2025-12-28T15:00:00Z",
+  "events": [
+    {
+      "date": "2026-01-20",
+      "title": "Trump Inauguration Anniversary Milestone",
+      "summary": "Commemoration of second term start amid ongoing policy implementations.",
+      "impact": "medium",
+      "tags": ["domestic", "trump"]
+    },
+    {
+      "date": "2026-01-15",
+      "title": "Potential Uganda General Elections",
+      "summary": "President Museveni seeks re-election amid regional stability concerns.",
+      "impact": "medium",
+      "tags": ["international", "africa"]
+    },
+    {
+      "date": "2026-02-01",
+      "title": "U.S.-China Trade Negotiations Phase",
+      "summary": "Expected discussions on tariffs and tech competition.",
+      "impact": "high",
+      "tags": ["finance", "china"]
+    },
+    {
+      "date": "2026-01-12",
+      "title": "U.S.-Japan Alliance Review",
+      "summary": "High-level talks on defense cooperation.",
+      "impact": "medium",
+      "tags": ["international"]
+    }
+  ]
+}
+

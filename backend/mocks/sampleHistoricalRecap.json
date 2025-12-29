@@ -1,0 +1,13 @@
+{
+  "content": "Over the past week, key developments included passage of fiscal legislation in Congress and escalation of trade disputes with the EU.",
+  "tags": ["domestic", "finance", "international"],
+  "sentiment": 0.1,
+  "relationships": {
+    "usa": { "linkedEntity": "eu", "type": "economic" }
+  },
+  "temporalLayer": "historical",
+  "provenance": { "source": "news_aggregation", "credibility": 0.88 },
+  "interactionState": "static",
+  "generatedAt": "2025-12-28T12:00:00Z"
+}
+

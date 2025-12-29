@@ -1,0 +1,14 @@
+{
+  "content": "Forward risks in early 2026 include potential U.S.-China trade deal negotiations, sustained precious metals rally, and ceasefire fragility in Ukraine. Regional elections in Africa may spark instability.",
+  "tags": ["international", "finance", "trump", "china", "ukraine"],
+  "sentiment": 0.1,
+  "relationships": {
+    "usa": { "linkedEntity": "china", "type": "economic" },
+    "russia": { "linkedEntity": "ukraine", "type": "conflict" }
+  },
+  "temporalLayer": "predictive",
+  "provenance": { "source": "web_search", "credibility": 0.85 },
+  "interactionState": "static",
+  "generatedAt": "2025-12-28T20:00:00Z"
+}
+

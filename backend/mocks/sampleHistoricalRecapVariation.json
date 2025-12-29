@@ -1,0 +1,14 @@
+{
+  "content": "In 2025, key developments included Trump's second inauguration, intensified U.S.-China competition in AI and trade, Syrian regime change, and escalating conflicts in Gaza and Ukraine. Commodity rallies dominated finance amid global volatility.",
+  "tags": ["domestic", "international", "finance", "trump", "china"],
+  "sentiment": -0.2,
+  "relationships": {
+    "usa": { "linkedEntity": "china", "type": "conflict" },
+    "trump": { "linkedEntity": "vance", "type": "alliance" }
+  },
+  "temporalLayer": "historical",
+  "provenance": { "source": "osint", "credibility": 0.88 },
+  "interactionState": "static",
+  "generatedAt": "2025-12-28T12:00:00Z"
+}
+

@@ -1,0 +1,14 @@
+{
+  "content": "Tensions rise in the South China Sea as naval exercises intensify. U.S. Treasury yields climb amid inflation concerns. Trump announces new policy advisory team including Vance.",
+  "tags": ["international", "finance", "trump", "vance", "domestic"],
+  "sentiment": -0.3,
+  "relationships": {
+    "trump": { "linkedEntity": "vance", "type": "alliance" },
+    "usa": { "linkedEntity": "china", "type": "conflict" }
+  },
+  "temporalLayer": "current",
+  "provenance": { "source": "web_search", "credibility": 0.92 },
+  "interactionState": "streaming",
+  "generatedAt": "2025-12-28T14:30:00Z"
+}
+

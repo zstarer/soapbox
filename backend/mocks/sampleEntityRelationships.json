@@ -1,0 +1,16 @@
+{
+  "content": "Current salient geopolitical entity interconnections include U.S. mediation in Ukraine-Russia tensions and economic rivalry with China.",
+  "tags": ["international", "trump", "ukraine", "china", "russia"],
+  "sentiment": -0.1,
+  "relationships": {
+    "trump": { "linkedEntity": "zelenskyy", "type": "alliance" },
+    "usa": { "linkedEntity": "china", "type": "conflict" },
+    "russia": { "linkedEntity": "china", "type": "support" },
+    "ukraine": { "linkedEntity": "usa", "type": "support" }
+  },
+  "temporalLayer": "current",
+  "provenance": { "source": "osint", "credibility": 0.89 },
+  "interactionState": "interactive",
+  "generatedAt": "2025-12-28T17:00:00Z"
+}
+

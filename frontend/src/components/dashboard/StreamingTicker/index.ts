@@ -1,0 +1,2 @@
+export { StreamingTicker } from './StreamingTicker';
+

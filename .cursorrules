@@ -1,0 +1,20 @@
+# SOAPBOX Development Guardrails & Cursor Rules
+
+Goal: Prevent future drift from the project's minimalist, composable philosophy.
+
+## Core Philosophy
+- **Composability over Hardcoding**: Always prioritize building small, reusable, and composable components/functions over single-purpose, hardcoded features.
+- **Clean Interfaces**: Hide advanced options and complexity behind clean, intuitive interfaces (e.g., drawers, modals, or collapsed sections).
+- **Minimalist UI**: Never add visible tag filtering or complex controls directly to the main view without a containment strategy (like a drawer).
+- **User Choice**: Favor user-defined configurations and settings over rigid defaults.
+
+## Technical Guardrails
+- **Backward Compatibility**: All schema changes must be implemented as optional fields to ensure backward compatibility and prevent breaking changes.
+- **Minimal Dependencies**: Before adding a new library, evaluate if the functionality can be implemented simply using existing tools.
+
+## Project Management
+- **Plane MCP Integration**: Use Plane to align tasks with the project roadmap:
+  - When starting a task, check Plane for a corresponding issue.
+  - Upon completion, mark the relevant issue as "Done".
+  - Avoid redundant comments in Plane; Git history serves as the primary technical record.
+
