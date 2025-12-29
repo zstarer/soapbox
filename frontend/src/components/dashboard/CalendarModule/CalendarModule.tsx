@@ -1,7 +1,7 @@
 import React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { GrokData } from '../../../../../shared/types';
+import { GrokData } from '@/types/shared';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

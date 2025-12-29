@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowUpDown } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { GrokData } from '../../../../../shared/types';
+import { GrokData } from '@/types/shared';
 import { SortOption } from '../types';
 
 function cn(...inputs: ClassValue[]) {

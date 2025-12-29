@@ -32,6 +32,7 @@ export const authOptions: NextAuthOptions = {
 
           const response = await fetch(loginUrl, {
             method: 'POST',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
             },

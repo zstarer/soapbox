@@ -1,5 +1,5 @@
 // frontend/src/mocks/mockData.ts
-import { GrokData } from '../../../shared/types';
+import { GrokData } from '@/types/shared';
 
 export const mockCurrentEvents: GrokData = {
   content: "Tensions rise in the South China Sea as naval exercises intensify. U.S. Treasury yields climb amid inflation concerns. Trump announces new policy advisory team including Vance.",

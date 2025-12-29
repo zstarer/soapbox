@@ -10,7 +10,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
-import { PrismaClient } from '../generated/prisma';
+import cookieParser from 'cookie-parser';
+import { PrismaClient, Prisma } from '../generated/prisma';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { GrokData } from '../../shared/types';
@@ -45,6 +46,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // If running behind a reverse proxy (common in production), trust the proxy for correct IP detection.
 if (process.env.NODE_ENV === 'production') {
@@ -363,10 +365,11 @@ app.post('/api/auth/login', authLimiter, async (req: Request, res: Response) => 
     console.log(`🔐 User logged in: ${user.email}`);
 
     // Set secure cookie for backend token (avoid exposing JWT to JS)
+    // sameSite: 'lax' allows cross-origin requests from same-site (localhost:3000 -> localhost:3001)
     res.cookie('soapbox_auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -375,6 +378,7 @@ app.post('/api/auth/login', authLimiter, async (req: Request, res: Response) => 
       id: user.id,
       email: user.email,
       name: user.name,
+      backendToken: token, // Include token for Authorization header (cross-origin fetch)
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -388,7 +392,7 @@ app.post('/api/auth/logout', async (_req: Request, res: Response) => {
     res.clearCookie('soapbox_auth_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       path: '/',
     });
 
@@ -396,6 +400,306 @@ app.post('/api/auth/logout', async (_req: Request, res: Response) => {
   } catch (error) {
     console.error('Logout error:', error);
     res.status(500).json({ error: 'Logout failed. Please try again.' });
+  }
+});
+
+// ============================================
+// JWT AUTH MIDDLEWARE
+// ============================================
+
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
+function authenticateToken(req: AuthenticatedRequest, res: Response, next: () => void) {
+  // Check cookie first (preferred)
+  const cookieToken = req.cookies?.soapbox_auth_token;
+  // Fallback to Authorization header
+  const authHeader = req.headers.authorization;
+  const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  
+  const token = cookieToken || headerToken;
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
+    req.userId = decoded.userId;
+    next();
+  } catch {
+    return res.status(403).json({ error: 'Invalid or expired token' });
+  }
+}
+
+// ============================================
+// USER SETTINGS API (Sprint 1 - SOAPBOX-13, 20, 21)
+// ============================================
+
+// GET /api/user/settings - Get merged settings (global + current workspace overrides)
+app.get('/api/user/settings', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: {
+        settings: true,
+        workspaces: true,
+        subscriptionTier: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Parse settings with defaults
+    const settings = (user.settings || {}) as Record<string, unknown>;
+    const workspaces = (user.workspaces || []) as Array<Record<string, unknown>>;
+    
+    // Ensure default workspace exists
+    const hasDefault = workspaces.some((w) => w.id === 'default');
+    if (!hasDefault) {
+      workspaces.unshift({
+        id: 'default',
+        name: 'Default',
+        icon: '🌐',
+        settingsOverrides: {},
+        windowState: [],
+      });
+    }
+
+    res.json({
+      settings,
+      workspaces,
+      subscriptionTier: user.subscriptionTier || 'free',
+    });
+  } catch (error) {
+    console.error('Get settings error:', error);
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+// PATCH /api/user/settings - Update global settings
+app.patch('/api/user/settings', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { settings } = req.body;
+
+    if (!settings || typeof settings !== 'object') {
+      return res.status(400).json({ error: 'Settings object is required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { settings: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Deep merge existing settings with new settings
+    const existingSettings = (user.settings || {}) as Record<string, unknown>;
+    const mergedSettings = deepMerge(existingSettings, settings);
+
+    const updated = await prisma.user.update({
+      where: { id: req.userId },
+      data: { settings: mergedSettings as Prisma.InputJsonValue },
+      select: { settings: true },
+    });
+
+    console.log(`⚙️  Settings updated for user ${req.userId}`);
+    res.json({ settings: updated.settings });
+  } catch (error) {
+    console.error('Update settings error:', error);
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
+});
+
+// Deep merge helper for settings
+function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...target };
+  
+  for (const key of Object.keys(source)) {
+    const sourceValue = source[key];
+    const targetValue = result[key];
+    
+    if (
+      sourceValue &&
+      typeof sourceValue === 'object' &&
+      !Array.isArray(sourceValue) &&
+      targetValue &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      result[key] = deepMerge(
+        targetValue as Record<string, unknown>,
+        sourceValue as Record<string, unknown>
+      );
+    } else {
+      result[key] = sourceValue;
+    }
+  }
+  
+  return result;
+}
+
+// ============================================
+// WORKSPACES API (Sprint 1 - SOAPBOX-10, 12)
+// ============================================
+
+// POST /api/workspaces - Create new workspace
+app.post('/api/workspaces', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { name, icon, settingsOverrides } = req.body;
+
+    if (!name || typeof name !== 'string') {
+      return res.status(400).json({ error: 'Workspace name is required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { workspaces: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const workspaces = (user.workspaces || []) as Array<Record<string, unknown>>;
+
+    // Generate unique ID
+    const newWorkspace = {
+      id: crypto.randomUUID(),
+      name: name.trim(),
+      icon: icon || '📁',
+      settingsOverrides: settingsOverrides || {},
+      windowState: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    workspaces.push(newWorkspace);
+
+    await prisma.user.update({
+      where: { id: req.userId },
+      data: { workspaces: workspaces as Prisma.InputJsonValue[] },
+    });
+
+    console.log(`📁 Workspace created: ${newWorkspace.name} (${newWorkspace.id})`);
+    res.status(201).json({ workspace: newWorkspace });
+  } catch (error) {
+    console.error('Create workspace error:', error);
+    res.status(500).json({ error: 'Failed to create workspace' });
+  }
+});
+
+// PATCH /api/workspaces/:id - Update workspace
+app.patch('/api/workspaces/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, icon, settingsOverrides, windowState } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { workspaces: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const workspaces = (user.workspaces || []) as Array<Record<string, unknown>>;
+    const workspaceIndex = workspaces.findIndex((w) => w.id === id);
+
+    if (workspaceIndex === -1) {
+      // If workspace doesn't exist and it's the default, create it
+      if (id === 'default') {
+        const defaultWorkspace = {
+          id: 'default',
+          name: name || 'Default',
+          icon: icon || '🌐',
+          settingsOverrides: settingsOverrides || {},
+          windowState: windowState || [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        workspaces.unshift(defaultWorkspace);
+        
+        await prisma.user.update({
+          where: { id: req.userId },
+          data: { workspaces: workspaces as Prisma.InputJsonValue[] },
+        });
+
+        return res.json({ workspace: defaultWorkspace });
+      }
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+
+    const workspace = workspaces[workspaceIndex] as Record<string, unknown>;
+
+    // Update fields if provided
+    if (name !== undefined) workspace.name = name;
+    if (icon !== undefined) workspace.icon = icon;
+    if (settingsOverrides !== undefined) {
+      workspace.settingsOverrides = deepMerge(
+        (workspace.settingsOverrides || {}) as Record<string, unknown>,
+        settingsOverrides
+      );
+    }
+    if (windowState !== undefined) workspace.windowState = windowState;
+    workspace.updatedAt = new Date().toISOString();
+
+    workspaces[workspaceIndex] = workspace;
+
+    await prisma.user.update({
+      where: { id: req.userId },
+      data: { workspaces: workspaces as Prisma.InputJsonValue[] },
+    });
+
+    console.log(`📁 Workspace updated: ${workspace.name} (${id})`);
+    res.json({ workspace });
+  } catch (error) {
+    console.error('Update workspace error:', error);
+    res.status(500).json({ error: 'Failed to update workspace' });
+  }
+});
+
+// DELETE /api/workspaces/:id - Delete workspace (protect default)
+app.delete('/api/workspaces/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (id === 'default') {
+      return res.status(400).json({ error: 'Cannot delete the default workspace' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { workspaces: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const workspaces = (user.workspaces || []) as Array<Record<string, unknown>>;
+    const filteredWorkspaces = workspaces.filter((w) => w.id !== id);
+
+    if (filteredWorkspaces.length === workspaces.length) {
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+
+    await prisma.user.update({
+      where: { id: req.userId },
+      data: { workspaces: filteredWorkspaces as Prisma.InputJsonValue[] },
+    });
+
+    console.log(`🗑️  Workspace deleted: ${id}`);
+    res.json({ message: 'Workspace deleted', id });
+  } catch (error) {
+    console.error('Delete workspace error:', error);
+    res.status(500).json({ error: 'Failed to delete workspace' });
   }
 });
 

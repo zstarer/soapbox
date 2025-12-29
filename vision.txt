@@ -1,0 +1,25 @@
+Product Vision Document (Condensed v1.0 – December 29, 2025)
+Name: SOAPBOX
+Tagline: The Intelligence Operating System
+Core Thesis
+Most intelligence platforms are either bloated enterprise portals or fragmented news aggregators. SOAPBOX is a minimalist, real-time desktop environment that turns the browser into a personal command center for understanding complex, multidimensional reality—geopolitics, technology, markets, narratives—through structured AI reasoning, visual composability, and user-controlled depth.
+Guiding Principles
+
+Minimalism by default, infinite configurability on demand
+Composable windows > monolithic pages
+All advanced controls hidden behind drawers, modals, or hotkeys
+Subtle calibration: pro-Western, pro-meritocracy, pro-human flourishing (never overt)
+WCAG 2.2 AA compliance from day one
+Backward-compatible schema evolution (optional fields only)
+Freemium: generous free tier, paid unlocks depth and aesthetics
+
+Target User
+Independent analysts, policy researchers, investors, technologists, and curious citizens who want Signal without the noise, Maltego without the complexity, and Bloomberg without the price tag.
+Differentiators
+
+OS-like draggable workspace with per-workspace persistence
+Temporal layers (historical → current → predictive) in one feed
+Propaganda/narrative tracking with credibility scoring
+Entity relationship force graphs with sentiment deltas
+Multi-domain expansion (geopolitics → AI/semi → energy/climate → biotech)
+Hotkey-driven power user workflow with cheatsheet

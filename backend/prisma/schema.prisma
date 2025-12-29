@@ -20,6 +20,14 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
+  // Settings & Workspace Configuration (Sprint 1 - SOAPBOX-13, SOAPBOX-20, SOAPBOX-21)
+  // All fields optional with defaults for strict backward compatibility
+  settings      Json?     @default("{}")
+  workspaces    Json[]    @default([])
+  
+  // Premium subscription tier (SOAPBOX-15 gating)
+  subscriptionTier String? @default("free")
+  
   accounts      Account[]
   sessions      Session[]
 }

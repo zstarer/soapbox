@@ -1,0 +1,465 @@
+---
+TICKET: SOAPBOX-28
+NAME: Create prompt variants for non-geopolitical domains
+STATE: Backlog
+PRIORITY: medium
+DESCRIPTION:
+Duplicate and adapt existing prompts for non-geopolitical domains:
+- AI/Semiconductors
+- Spaceflight/Robotics
+- Energy/Climate
+- Biotech/Health
+
+Implementation: Create domain-specific prompt files following the pattern of geopoliticsPrompts.v1.ts (to be created).
+
+Acceptance Criteria:
+- Domain-specific prompts created
+- Output follows same GrokData schema
+- Domain-specific entities and relationships defined
+- Sentiment calibration adapted per domain
+
+---
+TICKET: SOAPBOX-27
+NAME: Build propaganda and narrative monitor module
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Timeline/heatmap view for information warfare tracking with country-coded flags, propagation chains, and credibility scoring. Syncs with sidebar filters.
+
+Features:
+- Timeline visualization of propaganda events
+- Heatmap showing intensity by region/time
+- Country-coded flag icons
+- Propagation chain visualization
+- Credibility scoring display
+
+Dependencies: Requires propaganda metadata in schema (Epic 1.2)
+
+Acceptance Criteria:
+- Timeline/heatmap renders correctly
+- Country flags display appropriately
+- Propagation chains visualized
+- Filters from sidebar apply
+- Click for detailed view
+
+---
+TICKET: SOAPBOX-26
+NAME: Create market and commodities tracker module
+STATE: Backlog
+PRIORITY: medium
+DESCRIPTION:
+Dedicated market monitoring module with mini-charts for relevant instruments and linked geopolitical context snippets.
+
+Features:
+- Mini-charts (sparklines or small candlesticks)
+- Key market indicators relevant to current events
+- Links between market movements and geopolitical context
+- Real-time or near-real-time updates
+
+Data Requirements: Will need market data API integration (consider Yahoo Finance, Alpha Vantage, or similar).
+
+Acceptance Criteria:
+- Module displays in standard window
+- Mini-charts render correctly
+- Context snippets link to relevant feed items
+- Responsive design
+
+---
+TICKET: SOAPBOX-25
+NAME: Develop interactive entity relationship graph module
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Force-directed or hierarchical graph visualization using current and hypothetical relationships. Node details on click with sentiment deltas.
+
+Technical Considerations:
+- Consider D3.js, vis.js, or react-force-graph
+- Should integrate with existing Window component
+- Performance for large graphs
+
+Data Source: Uses relationships field from GrokData. Example from mocks shows structure like trump -> vance (alliance).
+
+Acceptance Criteria:
+- Interactive graph renders in draggable window
+- Nodes represent entities
+- Edges show relationship types with colors
+- Click node for details panel
+- Sentiment deltas visible on hover/click
+- Zoom and pan support
+
+---
+TICKET: SOAPBOX-24
+NAME: Premium theme availability
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Restrict all non-default themes to paid subscribers.
+
+Implementation:
+- Dark theme remains free
+- Light, OLED Black, High Contrast, custom themes require subscription
+- Clear visual indication of premium themes
+- Lock icon or similar on unavailable themes
+
+Acceptance Criteria:
+- Only Dark theme available to free users
+- Premium themes show lock/upgrade prompt
+- Paid users can access all themes
+
+Dependencies: Requires theme engine and Stripe integration
+
+---
+TICKET: SOAPBOX-23
+NAME: Feature gating logic
+STATE: Backlog
+PRIORITY: urgent
+DESCRIPTION:
+Server-side and client-side checks for premium features (themes, extended time horizons, future enhancements).
+
+Implementation:
+- Server-side middleware for API route protection
+- Client-side hooks for feature checks
+- Graceful degradation for free tier
+- Clear upgrade prompts
+
+Acceptance Criteria:
+- Premium features properly gated
+- Free users see upgrade prompts
+- No security bypass possible
+- Smooth UX for both tiers
+
+---
+TICKET: SOAPBOX-22
+NAME: Integrate Stripe for subscriptions
+STATE: Backlog
+PRIORITY: urgent
+DESCRIPTION:
+Set up Stripe subscription plans and billing portal integration.
+
+Implementation Scope:
+- Stripe account setup and API integration
+- Subscription plans (Free, Pro, etc.)
+- Checkout flow
+- Billing portal for managing subscriptions
+- Webhook handling for subscription events
+
+Backend Requirements:
+- Add subscription fields to User model
+- Stripe webhook endpoints
+- Subscription status API
+
+Acceptance Criteria:
+- Users can subscribe to paid plans
+- Billing portal accessible
+- Subscription status synced correctly
+- Webhooks handle all subscription events
+
+---
+TICKET: SOAPBOX-21
+NAME: Theme selection UI
+STATE: Backlog
+PRIORITY: medium
+DESCRIPTION:
+Add theme picker in Settings module with preview thumbnails.
+
+Acceptance Criteria:
+- Theme picker in settings
+- Visual previews of each theme
+- Premium themes clearly marked
+- Selection persists in user settings
+
+---
+TICKET: SOAPBOX-20
+NAME: Implement theme engine
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Support multiple themes via CSS variables or Tailwind classes:
+- Dark (current default)
+- Light
+- OLED Black
+- High Contrast
+- Custom color palettes
+
+Current State: frontend/src/app/globals.css has basic CSS variables for background/foreground. Glassmorphism styles defined.
+
+Implementation Notes: Consider using CSS custom properties with Tailwind's dark mode support. Theme should be switchable without page reload.
+
+Acceptance Criteria:
+- Theme engine supports multiple themes
+- Themes apply without page reload
+- All components respect theme variables
+- Consistent look across all themes
+
+---
+TICKET: SOAPBOX-18
+NAME: Active filter indicators and management
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Display removable filter chips above feed. Include 'Clear All' option. Filters apply in real-time with debounce.
+
+Acceptance Criteria:
+- Active filters shown as chips
+- Each chip has X button to remove
+- 'Clear All' button when filters active
+- Real-time filtering with 150-300ms debounce
+- Filter state persists per workspace
+
+---
+TICKET: SOAPBOX-17
+NAME: Faceted filter categories
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Implement filter sections for:
+- Entities: countries, persons, organizations (multi-select with OR logic)
+- Tags: existing tag system
+- Temporal Layers: historical, current, predictive
+- Sentiment Range: slider from -1.0 to +1.0
+- Propaganda Score/Origin: filter by score threshold and origin countries
+- Provenance Credibility: filter by source credibility
+- Domains: geopolitics, finance, tech, etc.
+
+Current State: StreamingTicker has basic tag filtering dropdown. No faceted filters.
+
+Acceptance Criteria:
+- All filter categories implemented
+- Multi-select with OR logic for entities
+- Range sliders where appropriate
+- Filters apply in real-time with debounce
+
+---
+TICKET: SOAPBOX-16
+NAME: Implement collapsible right-hand filter sidebar
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Thin vertical trigger on right edge; slides in as overlay (mobile) or push (desktop). Contains accordion sections for facets.
+
+Design:
+- Hidden by default to maintain minimalist UI
+- Subtle trigger (hover zone or icon)
+- Smooth animation
+- Push content on desktop, overlay on mobile
+
+Acceptance Criteria:
+- Sidebar toggles smoothly on click/hover
+- Remains hidden by default
+- Responsive behavior (overlay vs push)
+- Accordion sections for filter categories
+
+---
+TICKET: SOAPBOX-15
+NAME: Feed display customization
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Per-workspace controls for:
+- Summary lines (1/2/3)
+- Streaming direction (top/bottom)
+- Overflow behavior (truncate/expand)
+
+Update StreamingTicker to respect these settings dynamically.
+
+Current State: StreamingTicker has hardcoded display behavior. Sort/filter controls exist but no display customization.
+
+Acceptance Criteria:
+- Controls accessible in settings/sidebar
+- Settings apply to StreamingTicker immediately
+- Settings persist per workspace
+
+---
+TICKET: SOAPBOX-14
+NAME: Time horizon selector with tier gating
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Allow selection of 1/3/7/30 days time horizon. Free tier limited to 7 days max; paid users unrestricted. Filter data broadcasts accordingly.
+
+Implementation Notes: Requires subscription tier checking. WebSocket broadcasts should filter based on user's time horizon preference and tier.
+
+Acceptance Criteria:
+- Time horizon selector in UI
+- Free tier limited to 7 days
+- Paid tier can access 30+ days
+- Data filtering works correctly
+- Clear upgrade prompt for free users
+
+Dependencies: Requires payment infrastructure (Epic 4.2)
+
+---
+TICKET: SOAPBOX-13
+NAME: User settings persistence
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Extend User model with settings storage. Implement Settings module for global preferences (default time range, theme, etc.).
+
+Current State: User model has basic fields. SettingsLauncher component exists but doesn't persist settings.
+
+Implementation Notes: Add JSONB settings field to User model for flexibility.
+
+Acceptance Criteria:
+- User model extended with settings field
+- Settings API endpoints (GET/PATCH)
+- Settings persist across sessions
+- Settings sync across devices
+
+---
+TICKET: SOAPBOX-12
+NAME: Persistent module state per workspace
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Save/restore open windows, positions, sizes, and module-specific settings when switching workspaces.
+
+Current State: Window state is managed in React state via useState<WindowState[]> and refs. Positions are calculated dynamically.
+
+Implementation Notes: Need to serialize WindowState to backend and restore on workspace switch. Consider debounced auto-save.
+
+Acceptance Criteria:
+- Window positions/sizes persist across sessions
+- Open/closed state persists
+- Module-specific settings persist
+- Smooth transition when switching workspaces
+
+---
+TICKET: SOAPBOX-11
+NAME: Workspace switching UI
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Add workspace selector in header or bottom taskbar with icons. Support keyboard shortcuts (Ctrl/Cmd + 1–9).
+
+Current State: The dashboard has a bottom navbar in frontend/src/app/(protected)/dashboard/page.tsx that could be extended.
+
+Acceptance Criteria:
+- Workspace selector visible in UI
+- Shows current workspace name/icon
+- Dropdown/panel to switch workspaces
+- Keyboard shortcuts Ctrl/Cmd + 1-9
+- Visual indicator of active workspace
+
+---
+TICKET: SOAPBOX-10
+NAME: Implement multiple named workspaces per user
+STATE: Backlog
+PRIORITY: urgent
+DESCRIPTION:
+Add Prisma model or JSONB field for workspaces storing:
+- name
+- icon
+- open modules
+- positions/sizes
+- active filters
+- time horizon
+- display preferences
+
+Current State: The User model in backend/prisma/schema.prisma has basic fields. WindowState is stored client-side only in the dashboard component.
+
+Implementation Notes: Consider using a JSONB field for flexibility, or a separate Workspace model for more structured querying.
+
+Acceptance Criteria:
+- Users can create new workspaces
+- Users can rename workspaces
+- Users can delete workspaces
+- Users can switch between workspaces
+- Default workspace created on user registration
+
+---
+TICKET: SOAPBOX-9
+NAME: Add display mode metadata to schema
+STATE: Backlog
+PRIORITY: medium
+DESCRIPTION:
+Add optional field to enable user-controlled presentation:
+displayModes?: {
+  summaryLines?: 1 | 2 | 3;
+  streamingDirection?: 'top' | 'bottom';
+  overflowBehavior?: 'truncate' | 'expand';
+}
+
+Acceptance Criteria:
+- Schema extended with displayModes field
+- Field is optional for backward compatibility
+- Types properly defined in shared/types.ts
+
+---
+TICKET: SOAPBOX-8
+NAME: Finalize PROPAGANDA_DELIVERY_VECTORS_PROMPT
+STATE: Backlog
+PRIORITY: medium
+DESCRIPTION:
+Refine and parameterize the propaganda delivery vectors prompt for consistent, structured output across generations.
+
+Acceptance Criteria:
+- Prompt produces structured JSON output
+- Parameterized for different contexts
+- Clear documentation on usage
+
+---
+TICKET: SOAPBOX-7
+NAME: Add propaganda scoring and origin indicators to schema
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Introduce optional fields to GrokData interface:
+- propagandaScore?: number (0-1 scale)
+- propagandaOrigin?: string[] (country/entity codes)
+- propagandaVectors?: string[] (delivery mechanisms)
+
+Display as small flag icons with tooltip on hover showing score and origin.
+
+Acceptance Criteria:
+- Schema extended with propaganda metadata fields
+- Small flag icons appear in feed items when propaganda detected
+- Tooltips provide clear context on hover
+- Backward compatible with existing data
+
+---
+TICKET: SOAPBOX-6
+NAME: Standardize sentiment calibration guidelines across prompts
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Update every prompt in backend/prompts/geopoliticsPrompts.v1.ts (to be created) with consistent scoring instructions:
+- Overall sentiment: -1.0 to +1.0
+- Entity-level deltas where asymmetric impacts exist
+- Clear guidelines for edge cases
+
+Note: The prompts directory does not yet exist. This issue depends on the prompt system being established.
+
+Acceptance Criteria:
+- All prompts include standardized sentiment calibration instructions
+- Documentation for sentiment scoring methodology
+- Consistent output format across all prompt variants
+
+---
+TICKET: SOAPBOX-5
+NAME: Implement per-entity/faction sentiment deltas with rationale tooltips
+STATE: Backlog
+PRIORITY: high
+DESCRIPTION:
+Add optional fields to shared/types.ts:
+- entitySentiment?: Record<string, { value: number; rationale: string }>
+- Extend relationships entries with optional sentimentDelta: number
+
+In feed items (StreamingTicker), display a subtle sentiment indicator that reveals a tooltip on hover with faction-specific impacts and rationales.
+
+Current State: The existing GrokData interface in shared/types.ts has a single sentiment: number field. The relationships record only contains linkedEntity and type.
+
+Acceptance Criteria:
+- Optional entitySentiment field added to GrokData interface
+- Optional sentimentDelta added to relationship entries
+- StreamingTicker displays sentiment indicators per entity
+- Tooltip appears on hover showing faction-specific impacts and rationales
+- Backward compatible - existing data continues to work
+
+---
+TICKET: SOAPBOX-4
+NAME: Enforce schema backward compatibility
+STATE: Todo
+PRIORITY: none
+DESCRIPTION:
+Enforce a rule where all database/API schema changes must be optional fields to maintain backward compatibility.
